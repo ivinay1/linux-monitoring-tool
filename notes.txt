@@ -1,0 +1,23 @@
+mkdir brace expansion to create folder structure in linux
+Using curly brackets (braces) to create folder structure with `mkdir -p`
+
+mkdir -p work/{F1,F2,F3}/{temp1,temp2}
+It creates a folder structure like this work parent folder then F1,F2,F3 child folders and temp1 and temp2 child folders under three parent folder F1,F2,F3.
+
+mkdir -p work/{F1/{temp1,temp2},F2,F3}
+to create temp1,temp2 folders only under F1 not under F2 and F3
+
+Points to ponder
+1. Always verify your work before doing
+
+GIT REPO:
+
+COMMANDS USED:- 
+mkdir -p {config,logs,scripts,systemd,cron} 
+touch {config/config.env,logs/monitor.log,scripts/log_monitor.sh}
+mistake --> first create folder and then files (divide conquer)
+
+touch bspl{0001..0003}.c ----> brace expansion
+
+chmod +x scripts/log_monitor.sh
+
