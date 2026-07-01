@@ -21,3 +21,7 @@ touch bspl{0001..0003}.c ----> brace expansion
 
 chmod +x scripts/log_monitor.sh
 
+
+monitoring tools :- splunk, elk, grafana
+
+maintaining state
