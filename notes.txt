@@ -24,4 +24,5 @@ chmod +x scripts/log_monitor.sh
 
 monitoring tools :- splunk, elk, grafana
 
-maintaining state
+maintaining state is very imp --> dont redo start from where left
+u can mainain satte by using a variable and update it every time 
