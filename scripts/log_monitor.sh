@@ -7,25 +7,25 @@ then
 
     echo "Configuration Loaded Successsfully"
     
-    if [ -z "$LOG_FILE"]
+    if [ -z "$LOG_FILE" ]
     then    
         echo "ERROR: '$LOG_FILE' is not configured"
         exit 1
     else
-        if [ -f "$LOG_FILE"]
+        if [ -f "$LOG_FILE" ]
         then
             echo "Log File Found"
             echo "Ready To Scan..."
 
-            ERROR_COUNT=$(grep -ic "ERROR" '$LOG_FILE')
-            INFO_COUNT=$(grep -ic "INFO" '$LOG_FILE')
-            WARNING_COUNT=$(grep -ic "WARNING" '$LOG_FILE')
+            ERROR_COUNT=$(grep -ic "ERROR" $LOG_FILE)
+            INFO_COUNT=$(grep -ic "INFO" $LOG_FILE)
+            WARNING_COUNT=$(grep -ic "WARNING" $LOG_FILE)
 
             STATUS="OK"
-            if [ "$ERROR_COUNT" -gt 0 ]
+            if [ $ERROR_COUNT -gt 0 ]
             then
                 STATUS="ALERT"
-            elif [ "$WARNING_COUNT" -gt 0 ]
+            elif [ $WARNING_COUNT -gt 0 ]
             then
                 STATUS="WARNING"
             else 
