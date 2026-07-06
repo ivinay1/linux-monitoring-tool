@@ -31,16 +31,27 @@ then
             else 
                 STATUS="OK"
             fi
-    
+            
+	    ERROR_INFO=$(grep -i "ERROR" $LOG_FILE | awk '{$1=$2=$3=$4=""}1' | sort -u | nl)
+
+            ERROR_INFO_STATUS=$?
+
+	    if [ $ERROR_INFO_STATUS -eq 1 ]
+            then
+	      ERROR_INFO="no errors found"
+	    fi
+
             echo "====================Linux Monitor Report======================"
             echo "Log File        :   $LOG_FILE                                "
             echo "                                                              "
             echo "INFO Count      :   $INFO_COUNT                              "
-            echo "WARNING Count   :   $WARNING_COUNT                           "
+            echo "WARNING COUNT   :   $WARNING_COUNT                           "
             echo "ERROR Count     :   $ERROR_COUNT                             "
             echo "Status          :   $STATUS                                  "
-            echo "=============================================================="
-
+	    echo "                                                             "
+	    echo "----------------------------ERRORS---------------------------"
+            echo "$ERROR_INFO"                     
+            echo "============================================================="
             exit 0
         else
             echo "ERROR: Log File '$LOG_FILE' not found"
