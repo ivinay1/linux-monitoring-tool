@@ -11,6 +11,7 @@ then
         touch state/last_scan.txt
 	echo 'LastProcessed=0' > state/last_scan.txt
     fi
+        source state/last_scan.txt
         echo "Configuration Loaded Successsfully"
         echo "State file Loaded Successfully"
 
@@ -26,11 +27,31 @@ then
 
             TOTAL_NO_RECORDS=$(wc -l $LOG_FILE | awk '{print $1}')
 
+            # checking log rotation
+            if [ $TOTAL_NO_RECORDS -lt $LastProcessed ]
+            then
+		 echo "logs has been rotated or truncated"
+		 LastProcessed=0
+            fi 
+
+
 	    TOTAL_RECORDS_TO_BE_SCANNED=$((TOTAL_NO_RECORDS - LastProcessed))
-		
+	
+
+            if [ $TOTAL_RECORDS_TO_BE_SCANNED -eq 0 ]
+            then
+		 echo "No New LOGS are available for scanning"
+		 exit 0
+            fi
+
+
 	    RECORDS_TO_BE_SCANNED=$(tail -n $TOTAL_RECORDS_TO_BE_SCANNED $LOG_FILE) 
 
 	    VALUE_TO_BE_UPDATED=$((LastProcessed + TOTAL_RECORDS_TO_BE_SCANNED))
+
+            echo "LastProcessed=$LastProcessed"
+	    echo "TOTAL_NO_RECORDS=$TOTAL_NO_RECORDS"
+	    echo "VALUE_TO_BE_UPDATED=$VALUE_TO_BE_UPDATED"
 
             sed -i "s/LastProcessed=$LastProcessed/LastProcessed=$VALUE_TO_BE_UPDATED/" state/last_scan.txt 
 
