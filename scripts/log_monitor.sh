@@ -1,30 +1,87 @@
 #!/bin/bash
 
-#check if config file either exists
-if [ -f "config/config.env" ] 
-then
-    source config/config.env
+loadingConfigurations(){
+
+source config/config.env
+echo "Confirguration loaded sucessfully"
+
+}
+
+
+loadingState(){
+
+source $STATE_FILE
+echo "State File loaded sucessfully"
+
+}
+
+
+validatingLogFile(){
+
+  if [ -n "$LOG_FILE" ]
+  then
+      echo "ERROR: LOG FILE is not configured"
+  fi
+
+
+  if [ -f "$LOG_FILE" ]
+  then
+     echo "Log File Found"
+     echo "Ready to scan"
+   else
+       echo "Unable to find Log File"
+       exit 1
+   fi
+}
+
+
+stateFileCreation(){
+
+    # extract parent directory
+    parentDir=$(dirname "$STATE_FILE")
     
-    if [ ! -f "state/last_scan.txt" ]
+    mkdir -p "$parentDir"    
+
+    touch "$STATE_FILE"
+    
+    if [ ! -f "$STATE_FILE" ]
     then
-	mkdir state
-        touch state/last_scan.txt
-	echo 'LastProcessed=0' > state/last_scan.txt
-    fi
-        source state/last_scan.txt
-        echo "Configuration Loaded Successsfully"
-        echo "State file Loaded Successfully"
-
-        if [ -z "$LOG_FILE" ]
-        then    
-         echo "ERROR: '$LOG_FILE' is not configured"
+        echo "ERROR: unable to create state file"
         exit 1
-        else
-         if [ -f "$LOG_FILE" ]
-         then
-             echo "Log File Found"
-             echo "Ready To Scan..."
+    fi
+   
+    echo "LastProcessed=0" > "$STATE_FILE" 
+    echo "STATE FILE CREATED"
+    
+    # immediate checking file existence
+}
 
+
+validatingStateFile(){
+
+   if [ ! -z "$STATE_FILE" ]
+   then  
+	   echo "STATE FILE variable found"
+	   echo "Validating STATE FILE"
+
+	   if [ -f "$STATE_FILE" ]
+           then 
+		 echo "Validated STATE FILE"
+	   else
+		   echo "INVALID STATE FILE"
+		   echo "CREATING STATE FILE"
+                   stateFileCreation
+	   fi
+   else
+	   echo "ERROR: STATE FILE NOT CONFIGURED"
+           exit 1 
+   fi	   
+}
+
+
+logsScanning(){
+
+  
             TOTAL_NO_RECORDS=$(wc -l $LOG_FILE | awk '{print $1}')
 
             # checking log rotation
@@ -49,11 +106,11 @@ then
 
 	    VALUE_TO_BE_UPDATED=$((LastProcessed + TOTAL_RECORDS_TO_BE_SCANNED))
 
-            echo "LastProcessed=$LastProcessed"
-	    echo "TOTAL_NO_RECORDS=$TOTAL_NO_RECORDS"
-	    echo "VALUE_TO_BE_UPDATED=$VALUE_TO_BE_UPDATED"
+}
 
-            sed -i "s/LastProcessed=$LastProcessed/LastProcessed=$VALUE_TO_BE_UPDATED/" state/last_scan.txt 
+
+generateReport(){
+
 
             ERROR_COUNT=$(echo "$RECORDS_TO_BE_SCANNED" | grep -ic "ERROR" )
             INFO_COUNT=$(echo "$RECORDS_TO_BE_SCANNED" | grep -ic "INFO" )
@@ -93,12 +150,30 @@ then
             echo "$ERROR_INFO"                     
             echo "============================================================="
             exit 0
-        else
-            echo "ERROR: Log File '$LOG_FILE' not found"
-            exit 1
-        fi
-    fi
-else
-    echo "ERROR: Configuration file 'config/config.env' not found"
-    exit 1
-fi
+}
+
+
+updateState(){
+
+            sed -i "s/LastProcessed=$LastProcessed/LastProcessed=$VALUE_TO_BE_UPDATED/" state/last_scan.txt 
+}
+
+main(){
+
+loadingConfigurations
+
+loadingState
+
+validatingLogFile
+
+validatingStateFile
+
+logsScanning
+
+generateReport
+
+updateState
+
+}
+
+main
