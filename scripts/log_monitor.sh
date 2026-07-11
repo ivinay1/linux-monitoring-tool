@@ -160,6 +160,12 @@ updateState(){
 
 main(){
 
+scriptDir="$(dirname "${BASH_SOURCE[0]")"
+
+targetDir="$scriptDir/.."
+
+cd $targetDir
+
 loadingConfigurations
 
 loadingState
