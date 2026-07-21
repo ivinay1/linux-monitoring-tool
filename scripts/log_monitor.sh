@@ -1,5 +1,7 @@
 #!/bin/bash
 
+
+
 logInfo(){
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $MONITOR_EXECUTION_LOG
@@ -31,6 +33,19 @@ loadingState(){
 source $STATE_FILE
 logInfo "state File loaded sucessfully"
 }
+
+
+LOCK_FILE="/tmp/log_monitor.lock"
+
+exec 200>"$LOCK_FILE"
+
+flock -n 200 || {
+
+logWarning "Another instance is already running.Exiting"
+exit 1
+
+}
+
 
 
 validatingLogFile(){
