@@ -1,0 +1,9 @@
+# Linux-monitoring-tool
+
+# for CRON set up follow below step
+
+# STEP 1: cd cron
+
+# STEP 2: crontab cron/log-monitor.cron
+
+*/5 * * * *  /home/ubuntu/linux-monitoring-tool/scripts/log_monitor.sh

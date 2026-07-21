@@ -1,36 +1,54 @@
 #!/bin/bash
 
+logInfo(){
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $MONITOR_EXECUTION_LOG
+
+}
+
+logWarning(){
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [WARNING] $1" >> $MONITOR_EXECUTION_LOG
+
+}
+
+logError(){
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') [ERROR] $1" >> $MONITOR_EXECUTION_LOG
+
+}
+
+
 loadingConfigurations(){
 
 source config/config.env
-echo "Confirguration loaded sucessfully"
-
+logInfo " Confirguration loaded sucessfully"
 }
 
 
 loadingState(){
 
 source $STATE_FILE
-echo "State File loaded sucessfully"
-
+logInfo "state File loaded sucessfully"
 }
 
 
 validatingLogFile(){
 
-  if [ -n "$LOG_FILE" ]
+  if [ -z "$LOG_FILE" ]
   then
-      echo "ERROR: LOG FILE is not configured"
+     logError "ERROR: LOG FILE is not configured"
+      exit 1
   fi
 
 
   if [ -f "$LOG_FILE" ]
   then
-     echo "Log File Found"
-     echo "Ready to scan"
+          logInfo "Log File Found"
+	  logInfo "Ready To Scan"
    else
-       echo "Unable to find Log File"
-       exit 1
+          logError "Unable to find Log File"
+           exit 1
    fi
 }
 
@@ -46,14 +64,12 @@ stateFileCreation(){
     
     if [ ! -f "$STATE_FILE" ]
     then
-        echo "ERROR: unable to create state file"
-        exit 1
+	    logError " ERROR: unable to create state file" 
+            exit 1
     fi
    
     echo "LastProcessed=0" > "$STATE_FILE" 
-    echo "STATE FILE CREATED"
-    
-    # immediate checking file existence
+    logInfo " STATE FILE CREATED"     
 }
 
 
@@ -61,19 +77,19 @@ validatingStateFile(){
 
    if [ ! -z "$STATE_FILE" ]
    then  
-	   echo "STATE FILE variable found"
-	   echo "Validating STATE FILE"
+          logInfo " STATE FILE variable found"
+          logInfo " validating STATE FILE"
 
 	   if [ -f "$STATE_FILE" ]
            then 
-		 echo "Validated STATE FILE"
-	   else
-		   echo "INVALID STATE FILE"
-		   echo "CREATING STATE FILE"
+                  logInfo " validating STATE FILE"
+	   else	   
+                  logInfo " INVALID STATE FILE"
+                  logInfo " CREATING STATE FILE"
                    stateFileCreation
 	   fi
    else
-	   echo "ERROR: STATE FILE NOT CONFIGURED"
+           logError " ERROR: STATE FILE NOT CONFIGURED"
            exit 1 
    fi	   
 }
@@ -87,8 +103,8 @@ logsScanning(){
             # checking log rotation
             if [ $TOTAL_NO_RECORDS -lt $LastProcessed ]
             then
-		 echo "logs has been rotated or truncated"
-		 LastProcessed=0
+		    logInfo "logs has been rotated or truncated"
+		    LastProcessed=0
             fi 
 
 
@@ -97,8 +113,8 @@ logsScanning(){
 
             if [ $TOTAL_RECORDS_TO_BE_SCANNED -eq 0 ]
             then
-		 echo "No New LOGS are available for scanning"
-		 exit 0
+		    logInfo "No New LOGS are available for scanning"
+		    exit 0
             fi
 
 
@@ -138,29 +154,31 @@ generateReport(){
 	      ERROR_INFO="no errors found"
 	    fi
 
-            echo "====================Linux Monitor Report======================"
-            echo "Log File        :   $LOG_FILE                                "
-            echo "                                                              "
-            echo "INFO Count      :   $INFO_COUNT                              "
-            echo "WARNING COUNT   :   $WARNING_COUNT                           "
-            echo "ERROR Count     :   $ERROR_COUNT                             "
-            echo "Status          :   $STATUS                                  "
-	    echo "                                                             "
-	    echo "----------------------------ERRORS---------------------------"
-            echo "$ERROR_INFO"                     
-            echo "============================================================="
-            exit 0
+	    echo "======================Linux Monitor Report======================" >> $MONITOR_LOG
+	    echo " Log File         :   $LOG_FILE                                 " >> $MONITOR_LOG
+	    echo "                                                                " >> $MONITOR_LOG
+	    echo " INFO Count       :   $INFO_COUNT                               " >> $MONITOR_LOG
+	    echo " WARNING COUNT    :   $WARNING_COUNT                            " >> $MONITOR_LOG
+	    echo " ERROR Count      :   $ERROR_COUNT                              " >> $MONITOR_LOG
+	    echo " Status           :   $STATUS                                   " >> $MONITOR_LOG
+	    echo "                                                                " >> $MONITOR_LOG
+	    echo "------------------------------ERRORS----------------------------" >> $MONITOR_LOG
+	    echo "$ERROR_INFO" >> $MONITOR_LOG   
+	    echo "================================================================" >> $MONITOR_LOG 
+	    echo "                                                                " >> $MONITOR_LOG
+       	   
 }
 
 
 updateState(){
 
             sed -i "s/LastProcessed=$LastProcessed/LastProcessed=$VALUE_TO_BE_UPDATED/" state/last_scan.txt 
+            logInfo "updated state file"
 }
 
 main(){
 
-scriptDir="$(dirname "${BASH_SOURCE[0]")"
+scriptDir="$( dirname "${BASH_SOURCE[0]}" )"
 
 targetDir="$scriptDir/.."
 
@@ -179,7 +197,7 @@ logsScanning
 generateReport
 
 updateState
-
+exit 0
 }
 
 main
