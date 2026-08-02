@@ -2,15 +2,13 @@
 
 getStateFile(){
  
- 
-   updatedName=$(echo "$1" | sed 's#/#_#g' | sed 's#\.#_#g')
- 
-
+   updatedName=$(echo "$1" | sed 's#/#_#g' | sed 's#.#_#g')
+   
    if [ ! -f state/$updatedName ] 
    then 
       touch state/$updatedName 
-      echo "LastProcessed=0" > state/$updatedName
-      echo "EMAIL_SENT=false" >> state/$updatedName 
+      echo "last_scan=0" > state/$updatedName
+      echo "EMAIL_SENT=false" > state/$updatedName 
    fi
 
  echo "state/$updatedName"
@@ -20,7 +18,11 @@ sendAlertMail(){
 
   local report="$1"
 
-  echo "$report" | mail -s "Linux Monitoring Tool" "$ALERT_MAIL"
+  echo "$report" | mail -s
+  local report="$1"
+
+ echo "$report" | mail -s  
+
 }
 
 
@@ -48,7 +50,7 @@ loadingConfigurations(){
 source config/config.env  || {
 
 logError "unable to load configuration file"
-return 1
+exit 1
 
 }
 
@@ -56,19 +58,10 @@ logInfo " Confirguration loaded sucessfully"
 }
 
 
-loadingStateFile(){
+loadingState(){
 
-echo "loading state file $1"
-
-source "$1"
-
-echo "After soruce"
-
-echo "LastProcessed=[$LastProcessed]"
-echo "EMAIL_SENT=[$EMAIL_SENT]"
-
+source $1
 logInfo "state File loaded sucessfully"
-
 }
 
 
@@ -277,11 +270,11 @@ do
 
     validatingStateFile "$stateFile" || continue
 
-    logsScanning "$logFile" 
+    logsScanning "$logFile" |
 
     generateReport "$logFile"
 
-    checkingAlert
+    checkAlert
 
     updateState "$stateFile"
   
