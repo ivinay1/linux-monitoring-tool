@@ -20,7 +20,22 @@ sendAlertMail(){
 
   local report="$1"
 
-  echo "$report" | mail -s "Linux Monitoring Tool" "$ALERT_MAIL"
+  {
+    echo "Subject: Linux Monitoring Tool ALert"
+    echo 
+    echo "$REPORT" 
+  } | msmtp "avi95461@gmail.com"
+
+ STATUS=$?
+
+ if [ $STATUS -eq 0 ]
+ then
+     logInfo "Alert mail sent successfully"
+     return 0
+ else
+    logInfo "Alert mail unable to sent failed"
+    return 1
+ fi
 }
 
 
@@ -172,7 +187,7 @@ logsScanning(){
             if [ $TOTAL_RECORDS_TO_BE_SCANNED -eq 0 ]
             then
 		    logInfo "No New LOGS are available for scanning"
-		    return 0
+		    return 1
             fi
 
 
@@ -257,6 +272,9 @@ fi
 
 updateState(){
 
+        echo "Last Processede value to be updated $VALUE_TO_BE_UPDATED"
+	echo "EMAIL_SENT STATUS TO BE UPDATED $EMAIL_SENT"
+
 	sed -i "s/LastProcessed=.*/LastProcessed=$VALUE_TO_BE_UPDATED/" "$1"
 	sed -i "s/EMAIL_SENT=.*/EMAIL_SENT=$EMAIL_SENT/" "$1"
 
@@ -277,7 +295,7 @@ do
 
     validatingStateFile "$stateFile" || continue
 
-    logsScanning "$logFile" 
+    logsScanning "$logFile" || continue
 
     generateReport "$logFile"
 
