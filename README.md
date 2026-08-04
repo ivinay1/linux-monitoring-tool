@@ -84,6 +84,14 @@ linux-monitoring-tool/
 ```
 
 ---
+## Sample Execution
+<img width="393" height="339" alt="Email" src="https://github.com/user-attachments/assets/1cbe172b-035f-466a-982c-550387c4bf6e" />
+
+## Email received
+<img width="393" height="339" alt="Email" src="https://github.com/user-attachments/assets/295242d9-f683-4010-9497-91b00cfc06a3" />
+
+## Folder Structure
+<img width="526" height="339" alt="folderStruct" src="https://github.com/user-attachments/assets/f0bfc583-6c7a-4492-8d97-218bfb6850ea" />
 
 # Installation
 
