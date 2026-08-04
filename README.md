@@ -85,7 +85,7 @@ linux-monitoring-tool/
 
 ---
 ## Sample Execution
-<img width="393" height="339" alt="Email" src="https://github.com/user-attachments/assets/1cbe172b-035f-466a-982c-550387c4bf6e" />
+<img width="534" height="258" alt="Screenshot 2026-08-04 080652" src="https://github.com/user-attachments/assets/421f1a02-d03c-444c-88b4-5b26e2c1026f" />
 
 ## Email received
 <img width="393" height="339" alt="Email" src="https://github.com/user-attachments/assets/295242d9-f683-4010-9497-91b00cfc06a3" />
